@@ -1,0 +1,23 @@
+doctype html
+html(lang="en")
+    head
+        meta(charset="UTF-8")
+        meta(name="viewport", content="width=device-width, initial-scale=1.0")
+        title plst2
+        link(rel="stylesheet", href="styles/reset.css")
+        link(rel="stylesheet", href="styles/layout.scss")
+        
+    body(class='preload') 
+        script(src="scripts/transition-fix.js") 
+        header 
+            h1(class='header-logo') plst 
+            nav 
+                ul 
+                    li(class='header-nav')
+                        a(class='header-nav-link' href='index.pug') index
+                        a(class='header-nav-link' href='watch.pug') watch
+                        a(class='header-nav-link' href='docs.pug') docs
+        div(class='content-wrapper')
+            block sidebar-nav
+            main 
+                block content

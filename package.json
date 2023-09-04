@@ -10,6 +10,7 @@
   "private": true,
   "devDependencies": {
     "@parcel/transformer-pug": "2.9.3",
+    "@parcel/transformer-sass": "2.9.3",
     "concurrently": "^8.2.1",
     "nodemon": "^3.0.1",
     "parcel": "^2.9.3"
@@ -19,9 +20,9 @@
   },
   "scripts": {
     "start-watch": "nodemon --esm main.ts",
-    "build-watch": "parcel watch public/index.pug",
+    "build-watch": "parcel watch public/index.pug public/404.pug",
     "dev": "concurrently --kill-others \"yarn start-watch\" \"yarn build-watch\"",
-    "build": "parcel build public/index.pug",
+    "build": "parcel build public/index.pug public/404.pug",
     "start": "yarn build && ts-node --esm main.ts"
   },
   "targets": {

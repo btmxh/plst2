@@ -1,0 +1,16 @@
+extends layout.pug 
+
+block sidebar-nav 
+    ul(class='sidebar-nav')
+        p(style={
+            'font-weight': '600',
+            'font-style': 'italics',
+            'line-height': '1.2',
+        }) plst docs
+        li
+            a getting started
+        li
+            a api reference
+
+block content
+    section(class='.content')

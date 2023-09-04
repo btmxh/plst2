@@ -1,0 +1,78 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+header {
+  display: flex;
+  padding: 0.5rem;
+  align-items: center;
+}
+
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  padding: 0.5rem;
+}
+
+h1 {
+  font-weight: bold;
+  font-size: 2rem;
+  line-height: 2;
+}
+
+a {
+  $text-color: #027de0;
+  color: $text-color;
+  transition: all 0.5s ease;
+
+  &:hover {
+    filter: brightness(150%);
+    text-decoration: underline;
+  }
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.header-logo {
+  margin-right: 2rem;
+  margin-bottom: 0.5rem;
+  font-style: italic;
+  font-weight: 600;
+  font-family: serif;
+  font-size: 2rem;
+  line-height: 2rem;
+}
+
+.header-nav {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.header-nav > a {
+  font-family: Menlo, Monaco, Consolas, "Liberation Mono", "Courier New",
+    monospace;
+  font-size: 1.25rem;
+}
+
+.content-wrapper {
+  display: flex;
+}
+
+.sidebar-nav {
+  list-style-type: disc;
+  list-style-position: inside;
+  border-radius: 0.5rem;
+  border-color: black;
+  border-width: 0.125rem;
+  border-style: solid;
+  padding: 0.5rem;
+  width: 30%;
+}
+
+.preload * {
+  transition: none !important;
+}
