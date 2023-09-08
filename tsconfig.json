@@ -1,7 +1,8 @@
 {
-    "compilerOptions": {
-        "module": "ESNext",
-        "allowSyntheticDefaultImports": true,
-        "moduleResolution": "NodeNext"
-    }
+  "compilerOptions": {
+    "module": "NodeNext",
+    "allowSyntheticDefaultImports": true,
+    "moduleResolution": "NodeNext",
+    "target": "ES2017"
+  }
 }

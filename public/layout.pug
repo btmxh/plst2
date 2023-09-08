@@ -4,20 +4,20 @@ html(lang="en")
         meta(charset="UTF-8")
         meta(name="viewport", content="width=device-width, initial-scale=1.0")
         title plst2
-        link(rel="stylesheet", href="styles/reset.css")
-        link(rel="stylesheet", href="styles/layout.scss")
-        
+        block head
+            link(rel="stylesheet", href=require("styles/reset.css"))
+            link(rel="stylesheet", href=require("styles/default.scss"))
+            link(rel="stylesheet", href=require("styles/header.scss"))
+            link(rel="stylesheet", href=require("styles/sidebar-nav.scss"))
     body(class='preload') 
-        script(src="scripts/transition-fix.js") 
-        header 
-            h1(class='header-logo') plst 
+        script(src=require("scripts/transition-fix.ts"))
+        script(src=require("scripts/toggle-header.ts") defer)
+        header(class='header') 
+            h1(class='logo') plst 
             nav 
                 ul 
                     li(class='header-nav')
-                        a(class='header-nav-link' href='index.pug') index
-                        a(class='header-nav-link' href='watch.pug') watch
-                        a(class='header-nav-link' href='docs.pug') docs
+                        a(class='header-nav-link' href='/index.html') index
+                        a(class='header-nav-link' href='/watch.html') watch
         div(class='content-wrapper')
-            block sidebar-nav
-            main 
-                block content
+            block content

@@ -1,1 +1,39 @@
-extends 404.pug
+extends layout.pug
+
+block append head
+    link(rel="stylesheet", href=require('./styles/player-details.scss'))
+    link(rel="stylesheet", href=require('./styles/player.scss'))
+
+block content
+    main
+        script(type="module", src=require('./scripts/watch.ts') defer) 
+        script(type="module", src=require('./scripts/tabbed-button-group.ts') defer) 
+        script(src="https://www.youtube.com/iframe_api", async) 
+        div(id='player-wrapper')
+            div(id='yt-player-wrapper')
+        div(id='player-details' class='tabbed-button-group')
+            nav
+                ul
+                    li
+                        button(type="button" class="tab-button active") playlist 
+                    li
+                        button(type="button" class="tab-button") controller 
+            div(class='tabs')
+                section(class='tab active playlist-tab')
+                    div(class='button-bar')
+                        button(type="button", class="playlist-refresh-btn") refresh
+                        button(type="button", class="playlist-prev-btn") prev
+                        button(type="button", class="playlist-up-btn") up
+                        button(type="button", class="playlist-down-btn") down
+                        button(type="button", class="playlist-next-btn") next
+                        button(type="button", class="playlist-remove-btn") remove
+                        form(method="post") 
+                            input(type="text", class='text-input-drop', name="url", placeholder="add url to playlist...", ondragover="event.preventDefault()")
+                            button#add-url-btn(type="button") add
+                            input#add-to-end(type="radio", name="position", value="add-to-end")
+                            label(for="add-to-end") add to end
+                            input#queue-next(type="radio", name="position", value="queue-next", checked)
+                            label(for="queue-next") queue next
+                    form(id='playlist-form')
+                section(class='tab') chat
+

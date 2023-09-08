@@ -1,0 +1,58 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+.preload * {
+  transition: none !important;
+}
+
+header {
+  display: flex;
+  padding: 0.5rem;
+  align-items: center;
+}
+
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.5;
+}
+
+h1 {
+  font-weight: bold;
+  font-size: 2rem;
+  line-height: 2;
+}
+
+a {
+  $text-color: #027de0;
+  color: $text-color;
+  transition: all 0.5s ease;
+  cursor: pointer;
+
+  &:hover {
+    filter: brightness(150%);
+    text-decoration: underline;
+  }
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+blockquote {
+  background-color: antiquewhite;
+  display: inline-block;
+  padding: 0.2rem;
+}
+
+main {
+  & > p, blockquote {
+    margin-bottom: 0.5rem;
+  }
+}
+
+.small-padding {
+  padding: 1rem;
+}

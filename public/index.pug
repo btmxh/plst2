@@ -1,4 +1,32 @@
 extends layout.pug
 
 block content
-    h1 
+    main(class='small-padding')
+        h1
+            span(class='logo') plst
+            |  - a media player server
+        p
+            | go to 
+            a(href='/watch.html') watch
+            |  to watch stuff
+
+        p use apis (undocumented) to interact with stuff
+        
+        blockquote
+            p "dude is overengineering so hard omegalul"
+            p "webdev is cringe"
+            p "Have you heard of the critically defamed fugitive group hololive English -Adve..."
+
+        p
+            | this is designed as the music player for 
+            a(href="https://github.com/btmxh/nrs-impl") nrs
+            |  (see 
+            a(href="https://github.com/btmxh/nrs-impl/issues/97") here
+            |  for context), but one can use it as a general purpose media player
+        p
+            | inspired by 
+            a(href="https://github.com/calzoneman/sync") cytu.be
+            |  (thanks 
+            i /vt/
+            |  for introducing me to this), one can consider this to
+            | be a less bloated version of that
