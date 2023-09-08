@@ -76,6 +76,7 @@ function autonext(): boolean {
 }
 
 const port = parseInt(process.env.PORT);
+const host = process.env.HOST ?? "localhost";
 
 app.use(
   express.static(path.join(__dirname, "dist"), {
@@ -266,12 +267,12 @@ app.use(async (req, res, next) => {
   res.type("txt").send("not found");
 });
 
-const server = app.listen(port, () => {
-  console.log(`plst2 server running on http://localhost:${port}`);
+const server = app.listen(port, host, () => {
+  console.log(`plst2 server running on http://${host}:${port}`);
   console.log("Access the API via the /api/ endpoint");
   if (process.env.NODE_ENV === "production") {
     console.log(
-      `Webapp frontend is available at http://localhost:${port}/index`
+      `Webapp frontend is available at http://${host}:${port}/index`
     );
   } else {
     console.log(`Webapp frontend is hosted by webpack-dev-server`);
