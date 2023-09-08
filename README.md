@@ -26,3 +26,22 @@ yarn install
 yarn dev
 yarn start
 ```
+## autistic FAQ section
+
+>muh why cringe node.js, why don't use that rocket blazingly fast language or at least javac#kotlinetcetc
+
+i don't talk with languages that takes 10gb ram for lsp/1 hour of gradle initialization/2 hour of cargo build time + no hot reloading
+
+>muh why not deno and bun etc.
+
+bun is cooking up their autistic bundler which is too experimental for me to use
+
+deno is a bunch of unmaintained dependencies
+
+node/npm is cringe and all, but at least i have the ecosystem here
+
+>why are you so autistic
+
+read history
+
+
