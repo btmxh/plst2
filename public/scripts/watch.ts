@@ -17,8 +17,6 @@ window.onbeforeunload = function () {
 const addUrlBtn = document.getElementById("add-url-btn");
 addUrlBtn.addEventListener("click", async (e) => {
   const data = new FormData(addUrlBtn.parentElement as HTMLFormElement);
-  console.log(data);
-
   const response = await fetch("/api/playlist/add", {
     method: "POST",
     headers: {
@@ -36,14 +34,17 @@ addUrlBtn.addEventListener("click", async (e) => {
   }
 });
 
-let ytPlayer = null;
-function createYTPlayer(
-  resolve: (p: YT.Player) => void | undefined = undefined
-) {
-  const player = document.createElement("div");
-  const playerWrapper = document.getElementById("yt-player-wrapper");
-  playerWrapper.replaceChildren(player);
-  return new YT.Player(player, {
+const onPlayerStateChange = (event) => {
+  if (event.data === YT.PlayerState.ENDED) {
+    socket.send("next");
+  }
+};
+
+let ytPlayer: YT.Player;
+let resolveFn = (p: YT.Player) => {};
+
+(window as any).onYouTubeIframeAPIReady = () => {
+  const tempPlayer = new YT.Player(player, {
     width: "100%",
     height: "100%",
     playerVars: {
@@ -54,31 +55,33 @@ function createYTPlayer(
       cc_lang_pref: "en",
     },
     events: {
-      onReady: resolve !== undefined ? () => resolve(ytPlayer) : undefined,
+      onReady: () => {
+        ytPlayer = tempPlayer;
+        resolveFn(ytPlayer);
+      },
       onStateChange: onPlayerStateChange,
     },
   });
 }
 
-(window as any).onYouTubeIframeAPIReady = () => {
-  createYTPlayer((p) => (ytPlayer = p));
-};
+const tag = document.createElement('script');
+tag.src = "https://www.youtube.com/iframe_api";
+const firstScriptTag = document.getElementsByTagName('script')[0];
+firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+const player = document.createElement("div");
+const playerWrapper = document.getElementById("yt-player-wrapper");
+playerWrapper.replaceChildren(player);
 
-const onPlayerStateChange = (event) => {
-  if (event.data === YT.PlayerState.ENDED) {
-    socket.send("next");
-  }
-};
-const getYoutubePlayer = async (): Promise<YT.Player> => {
+const getYoutubePlayer = (): Promise<YT.Player> => {
   if (ytPlayer) {
     return Promise.resolve(ytPlayer);
   }
 
-  // potential race condition?
   return new Promise((resolve, reject) => {
-    (window as any).onYouTubeIframeAPIReady = () => {
-      return (ytPlayer = createYTPlayer(resolve));
-    };
+    resolveFn = resolve;
+    if(ytPlayer) {
+      resolve(ytPlayer);
+    }
   });
 };
 
@@ -88,25 +91,19 @@ const fetchPlayer = async () => {
   for (const child of playerWrapper.children) {
     child.classList.remove("active");
   }
-  if (current === null) {
-    return;
-  }
-  if (current.type === "yt") {
+  if (current?.type === "yt") {
     const ytPlayerWrapper = document.getElementById("yt-player-wrapper");
     ytPlayerWrapper.style.aspectRatio = current.aspectRatio;
     ytPlayerWrapper.classList.add("active");
     const yt = await getYoutubePlayer();
-    console.debug(current.ytId);
     yt.loadVideoById(current.ytId);
     yt.playVideo();
-  } else {
-    const playerWrapper = document.getElementById("yt-player-wrapper");
-    playerWrapper.innerHTML = await fetch("/ssr/player.html")
-      .then((r) => r.text())
-      .catch((err) => {
-        console.log("Unable to load media player", err);
-        return `<h1>error loading media player</h1>`;
-      });
+    console.log("yt player loaded");
+    return;
+  }
+
+  if(ytPlayer) {
+    ytPlayer.stopVideo();
   }
 };
 
@@ -132,11 +129,6 @@ const getPlaylistIds = (): number[] | undefined => {
 
 const fetchPlaylist = async () => {
   const playlistIds = getPlaylistIds();
-  console.debug(
-    JSON.stringify({
-      ids: playlistIds,
-    })
-  );
   document.getElementById("playlist-form").innerHTML = await fetch(
     "/ssr/playlist.html?ids=" + playlistIds.join(",")
   )
@@ -186,7 +178,6 @@ for (const dir of ["down", "up"]) {
   [...document.getElementsByClassName(`playlist-${dir}-btn`)].forEach((b) =>
     b.addEventListener("click", async (e) => {
       const ids = getPlaylistIds();
-      console.debug(ids);
       fetch("/api/playlist/edit", {
         method: "POST",
         headers: {
@@ -224,7 +215,6 @@ for (const input of document.getElementsByClassName("text-input-drop")) {
     e.preventDefault();
 
     const uri = dt.getData("URL");
-    console.debug(uri);
     if (uri.length !== 0) {
       elem.value = uri;
       return;
@@ -235,7 +225,5 @@ for (const input of document.getElementsByClassName("text-input-drop")) {
       elem.value = text;
       return;
     }
-
-    console.debug(dt.getData("text"));
   });
 }
