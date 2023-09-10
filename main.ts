@@ -10,8 +10,8 @@ import {
   currentPlaylistMedia,
   newContext,
 } from "./src/context.js";
-import { readFile, writeFile } from "fs/promises";
-import { writeFileSync } from "fs";
+import { readFile } from "fs/promises";
+import { existsSync, mkdirSync, writeFileSync } from "fs";
 const __dirname = url.fileURLToPath(new URL(".", import.meta.url));
 
 dotenv.config();
@@ -55,6 +55,10 @@ for (const exitEvent of exitEvents) {
     if (exitEvent === "uncaughtException") {
       console.error(e);
       code = 1;
+    }
+
+    if(!existsSync(".cache")) {
+      mkdirSync(".cache");
     }
     writeFileSync(".cache/context.json", JSON.stringify(context));
     process.exit(code);
@@ -172,6 +176,7 @@ app.post("/api/playlist/add", async (req, res) => {
 });
 
 function mediaUpdated() {
+  nextedClients.clear();
   wsWatchServer.clients.forEach((client) => {
     client.send("media-changed");
   });
@@ -239,8 +244,8 @@ app.delete("/api/playlist/edit", async (req, res) => {
   const newList = context.playlist.medias.filter((media) => !ids.has(media.id));
   const changed = newList.length !== context.playlist.medias.length;
   context.playlist.medias = newList;
-  if (ids.has(context.mediaIdCounter)) {
-    context.mediaIdCounter = null;
+  if (ids.has(context.playlist.currentMediaId)) {
+    context.playlist.currentMediaId = null;
     mediaUpdated();
   } else {
     playlistUpdated();
@@ -248,7 +253,16 @@ app.delete("/api/playlist/edit", async (req, res) => {
   res.status(changed ? 200 : 304).send();
 });
 app.get("/api/playlist/current", async (req, res) => {
+  console.debug("wtf");
   res.status(200).json(currentPlaylistMedia(context.playlist) ?? null);
+});
+
+let server = undefined;
+app.get("/api/exit", (req, res) => {
+  res.status(200).send();
+  wsWatchServer.close();
+  server?.close();
+  process.exit(0);
 });
 
 app.use(async (req, res, next) => {
@@ -267,7 +281,7 @@ app.use(async (req, res, next) => {
   res.type("txt").send("not found");
 });
 
-const server = app.listen(port, host, () => {
+server = app.listen(port, host, () => {
   console.log(`plst2 server running on http://${host}:${port}`);
   console.log("Access the API via the /api/ endpoint");
   if (process.env.NODE_ENV === "production") {

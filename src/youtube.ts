@@ -40,7 +40,7 @@ async function fetchYoutubeMedia(id: string): Promise<YoutubeMedia> {
   });
 }
 
-export async function mediaFromYoutubeVideoId(
+export async function fetchMedia(
   context: Context,
   id: string
 ): Promise<YoutubeMedia> {

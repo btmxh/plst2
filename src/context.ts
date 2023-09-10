@@ -1,5 +1,5 @@
 import { Indexed, Media } from "./media.js";
-import { YoutubeMedia, mediaFromYoutubeVideoId } from "./youtube.js";
+import * as yt from "./youtube.js";
 
 type Playlist = {
   medias: Indexed<Media>[];
@@ -9,7 +9,7 @@ type Playlist = {
 export type Context = {
   mediaIdCounter: number;
   playlist: Playlist;
-  youtubeCache: Record<string, YoutubeMedia>;
+  youtubeCache: Record<string, yt.YoutubeMedia>;
 };
 
 export function newPlaylist(): Playlist {
@@ -67,16 +67,15 @@ export async function addToPlaylist(
     }
   };
 
+  const ytId = getYoutubeVideoId(url);
   const ytRegex =
-    /^http(?:s?):\/\/(?:www\.)?youtu(?:be\.com\/watch\?v=|\.be\/)([\w\-\_]*)(&(amp;)?‌​[\w\?‌​=]*)?$/;
+    /^http(?:s?):\/\/(?:www\.)?youtu(?:be\.com\/watch\?v=|\.be\/)([\w\-\_]*)(&(amp;)?[\w\?=]*)?$/;
   const ytMatch = url.match(ytRegex);
   if (ytMatch) {
     const ytId = ytMatch[1];
-    const yt = await mediaFromYoutubeVideoId(context, ytId);
-    const id = ++context.mediaIdCounter;
     add({
-      ...yt,
-      id,
+      ...await yt.fetchMedia(context, ytId),
+      id: ++context.mediaIdCounter,
     });
 
     return;
