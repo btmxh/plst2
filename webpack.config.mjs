@@ -6,6 +6,7 @@ const __dirname = fileURLToPath(new URL(".", import.meta.url));
 dotenv.config();
 
 const prod = process.env.NODE_ENV === "production";
+const host = process.env.HOST ?? "localhost";
 
 const config = {
   entry: {
@@ -72,12 +73,12 @@ const config = {
     proxy: [
       {
         path: ["/api", "/ssr", "/playlist"],
-        target: `http://localhost:${process.env.PORT}/`,
+        target: `http://${host}:${process.env.PORT}/`,
         secure: false,
       },
       {
         path: "/watch",
-        target: `ws://localhost:${process.env.PORT}`,
+        target: `ws://${host}:${process.env.PORT}`,
         ws: true,
       },
     ],
