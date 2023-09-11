@@ -1,7 +1,7 @@
 const header = document.getElementsByClassName("header")[0];
 
 const threshold = 500;
-let lastPress = undefined;
+let lastPress: number | undefined = undefined;
 window.addEventListener("keydown", (ev) => {
   if (ev.key !== "Escape") {
     return;

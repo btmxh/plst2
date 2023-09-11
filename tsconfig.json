@@ -1,8 +1,9 @@
 {
   "compilerOptions": {
-    "module": "NodeNext",
+    "module": "ES2022",
     "allowSyntheticDefaultImports": true,
-    "moduleResolution": "NodeNext",
-    "target": "ES2017"
+    "moduleResolution": "Bundler",
+    "target": "ES2017",
+    "strict": true
   }
 }

@@ -7,6 +7,7 @@ dotenv.config();
 
 const prod = process.env.NODE_ENV === "production";
 const host = process.env.HOST ?? "localhost";
+const port = process.env.PORT ?? "8080";
 
 const config = {
   entry: {
@@ -72,13 +73,13 @@ const config = {
 
     proxy: [
       {
-        path: ["/api", "/ssr", "/playlist"],
-        target: `http://${host}:${process.env.PORT}/`,
+        path: ["/api", "/ssr", "/playlist", "/htmx.js"],
+        target: `http://${host}:${port}/`,
         secure: false,
       },
       {
         path: "/watch",
-        target: `ws://${host}:${process.env.PORT}`,
+        target: `ws://${host}:${port}`,
         ws: true,
       },
     ],

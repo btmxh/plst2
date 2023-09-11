@@ -1,14 +1,13 @@
-if playlist.medias.length == 0
+if playlist.playlist.length == 0
     div(style="text-align:center")
         h1(style="text-align: center") empty playlist
         span add more?
 else
-    - for(let i = playlist.medias.length - 1; i >= 0; i--)
-        - let media = playlist.medias[i];
+    each media, index in playlist.getMedias().reverse()
         div
             input(type="checkbox", name=`playlist-media-${media.id}`, checked=mediaChecked(media.id))
             label(for=`playlist-media-${media.id}`)
-                if media.id === playlist.currentMediaId
+                if index === playlist.playlist.length - 1 - playlist.currentMediaIndex
                     span(style="color: rgb(12, 187, 0)")
                         | > 
                 | !{media.displayHtml}
