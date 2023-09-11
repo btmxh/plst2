@@ -25,6 +25,11 @@ block content
             div(class='tabs')
                 section(class='tab active playlist-tab')
                     form.add-url-form(hx-post="/playlist/add", hx-target="#diagnostics", hx-swap="afterbegin") 
+                        input(type="text", list="playlist-url-presets", class='text-input-drop', name="url", placeholder="add url to playlist...", ondragover="event.preventDefault()")
+                        datalist#playlist-url-presets
+                            option(value="yt.be/search:") 
+                            option(value="yt.be/") 
+
                         button(type="submit") add
                         input#add-to-end(type="radio", name="position", value="add-to-end")
                         label(for="add-to-end") add to end
