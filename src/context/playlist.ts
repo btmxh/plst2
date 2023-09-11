@@ -87,16 +87,14 @@ export class Playlist {
   }
 
   updateIndex(transformer: (index: number) => number): Media | undefined {
-    const newIndex = transformer(this.currentMediaIndex);
+    let newIndex = transformer(this.currentMediaIndex);
 
     const newMediaId = this.#getPlaylistMediaId(newIndex);
+    let media;
     if (newMediaId === undefined) {
-      return undefined;
-    }
-
-    const media = this.#getMediaFromId(newMediaId);
-    if (media === undefined) {
-      return undefined;
+      newIndex = -1;
+    } else {
+      media = this.#getMediaFromId(newMediaId);
     }
 
     this.currentMediaIndex = newIndex;

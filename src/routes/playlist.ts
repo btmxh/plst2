@@ -84,5 +84,11 @@ export function playlistRouter(context: Context): Router {
     res.status(updated ? 200 : 304).send();
   });
 
+  router.patch("/goto/:id", (req, res) => {
+    const id = req.params.id;
+    const updated = context.gotoMedia(id);
+    res.status(updated? 200 : 304).send();
+  })
+
   return router;
 }

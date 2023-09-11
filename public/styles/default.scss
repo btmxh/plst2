@@ -25,11 +25,12 @@ h1 {
   line-height: 2;
 }
 
-a {
+a, .link-button {
   $text-color: #027de0;
   color: $text-color;
   transition: all 0.5s ease;
   cursor: pointer;
+  text-decoration: none;
 
   &:hover {
     filter: brightness(150%);
@@ -37,8 +38,17 @@ a {
   }
 }
 
-a:hover {
-  text-decoration: underline;
+.link-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: inline;
+  font: inherit;
+  text-align: start;
+  width: auto;
+  height: auto;
+  padding: 0;
+  align-items: normal;
 }
 
 blockquote {

@@ -4,11 +4,15 @@ if playlist.playlist.length == 0
         span add more?
 else
     each media, index in playlist.getMedias().reverse()
-        div
+        div.playlist-entry
             input(type="checkbox", name=`playlist-media-${media.id}`, checked=mediaChecked(media.id))
             label(for=`playlist-media-${media.id}`)
                 if index === playlist.playlist.length - 1 - playlist.currentMediaIndex
                     span(style="color: rgb(12, 187, 0)")
                         | > 
                 | !{media.displayHtml}
+            div.playlist-utilities
+                a(href=media.link, target="_blank") link
+                button.link-button(type="button", onclick=`navigator.clipboard.writeText('${media.link}')`) copy
+                a(hx-patch="/playlist/goto/" + media.id, hx-target="#diagnostics", hx-swap="afterbegin") goto
 

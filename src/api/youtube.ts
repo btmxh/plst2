@@ -84,6 +84,7 @@ export class Youtube {
     return {
       type: "yt",
       ytId: id,
+      link: `https://youtu.be/${id}`,
       length: video.duration ?? invalidDuration,
       aspectRatio:
         video.width !== undefined && video.height !== undefined

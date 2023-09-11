@@ -113,16 +113,25 @@ export class Context {
 
   removePlaylistMedias(ids: Set<string>): boolean {
     const currentId = this.playlist.getCurrentMedia()?.id;
-    if (currentId !== undefined || currentId !== null || ids.has(currentId)) {
+    if (currentId !== undefined && currentId !== null && ids.has(currentId)) {
       this.updatePlaylistIndex(() => -1);
     }
 
-    if(this.playlist.removeMedias(ids)) {
+    if (this.playlist.removeMedias(ids)) {
       this.#triggerPlaylistRefresh();
       return true;
     }
 
     return false;
+  }
+
+  gotoMedia(id: string): boolean {
+    const index = this.playlist.playlist.indexOf(id);
+    if (index < 0) {
+      return false;
+    }
+
+    return this.updatePlaylistIndex(() => index);
   }
 
   handleWebSocketUpgrade(

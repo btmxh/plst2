@@ -3,6 +3,7 @@ import { Duration } from "luxon";
 export type MediaData = (YoutubeVideoData | ServerMediaData) & MediaCommonData;
 
 export type MediaCommonData = {
+  link: string;
   displayHtml: string;
   length: Duration;
 };
