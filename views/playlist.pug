@@ -3,13 +3,14 @@ if playlist.playlist.length == 0
         h1(style="text-align: center") empty playlist
         span add more?
 else
+    - const currentMediaIndex = playlist.playlist.length - 1 - playlist.currentMediaIndex;
     each media, index in playlist.getMedias().reverse()
         - const humanIndex = playlist.playlist.length - index
-        - const current = index === playlist.playlist.length - 1 - playlist.currentMediaIndex;
+        - const current = index === currentMediaIndex;
         div.playlist-entry(id=current? "playlist-current-playing" : false)
             input(type="checkbox", name=`playlist-media-${media.id}`, checked=mediaChecked(media.id))
             label(for=`playlist-media-${media.id}`)
-                if index === playlist.playlist.length - 1 - playlist.currentMediaIndex
+                if index === currentMediaIndex
                     span(style="color: rgb(12, 187, 0)")
                         | > 
                 span.playlist-index !{humanIndex}. 
