@@ -1,4 +1,3 @@
-import { Media, MediaData } from "./media.js";
 import { Playlist, PlaylistAddPosition } from "./playlist.js";
 import { Youtube } from "../api/youtube.js";
 import { workspaceDir } from "../utils.js";
@@ -8,17 +7,14 @@ import { existsSync, mkdirSync, writeFileSync } from "fs";
 import * as ws from "ws";
 import { IncomingMessage } from "http";
 import { Duplex } from "stream";
-// @ts-ignore
-import Player from "mpris-service";
-import * as jsdom from "jsdom";
-import { fileURLToPath } from "url";
 import { urlToServerMedia } from "../api/server_media.js";
+import { MprisClient, createMprisClient } from "../api/mpris.js";
 
 export class Context {
   playlist: Playlist;
   youtube: Youtube;
   websocketServer: ws.WebSocketServer;
-  mprisPlayer: Player;
+  mprisClient: MprisClient;
 
   constructor(json: any = undefined) {
     this.playlist = new Playlist(json?.playlist);
@@ -27,18 +23,7 @@ export class Context {
       noServer: true,
       path: "/watch",
     });
-
-    this.mprisPlayer = Player({
-      name: "plst",
-      identity: "Media player server",
-      supportedUriSchemes: ["file", "http", "https"],
-      supportedInterfaces: ["player"],
-    });
-    this.mprisPlayer.on("next", () => this.updatePlaylistIndex((i) => i + 1));
-    this.mprisPlayer.on("previous", () =>
-      this.updatePlaylistIndex((i) => i - 1)
-    );
-    this.updateMpris();
+    this.mprisClient = createMprisClient(this);
   }
 
   toJSON() {
@@ -49,51 +34,9 @@ export class Context {
     };
   }
 
-  updateMpris() {
-    const currentPlaying = this.playlist.getCurrentMedia();
-    if (currentPlaying === null || currentPlaying === undefined) {
-      this.mprisPlayer.metadata = {};
-      this.mprisPlayer.playbackStatus = "Stopped";
-      return;
-    }
-
-    const xesam = (() => {
-      if (currentPlaying.type === "yt") {
-        const html = new jsdom.JSDOM(currentPlaying.displayHtml).window
-          .document;
-        const title =
-          html.querySelector(".yt-title")?.textContent ?? "Untitled";
-        const artist =
-          html.querySelector(".yt-author")?.textContent ?? "Unknown Artist";
-
-        return {
-          "xesam:title": title,
-          "xesam:artist": [artist],
-        };
-      } else if(currentPlaying.type === "server") {
-        return {
-          "xesam:title": path.basename(currentPlaying.path),
-          "xesam:artist": ["Unknown"],
-        };
-      }
-
-      return {};
-    })();
-
-    if (currentPlaying.length)
-      this.mprisPlayer.metadata = {
-        "mpris:trackid": this.mprisPlayer.objectPath(
-          `track/${currentPlaying.id}`
-        ),
-        "mpris:length": Math.round(currentPlaying.length) ?? (99 * 60 + 99) * 1000,
-        ...xesam,
-      };
-    this.mprisPlayer.playbackStatus = "Playing";
-  }
-
   async addToPlaylist(url: string, position: PlaylistAddPosition) {
     const media = await urlToServerMedia(url);
-    if(media !== undefined) {
+    if (media !== undefined) {
       this.playlist.add(media, position);
       this.#triggerPlaylistRefresh();
       return;
@@ -167,7 +110,7 @@ export class Context {
       client.send("media-changed")
     );
 
-    this.updateMpris();
+    this.mprisClient.update(this);
     return true;
   }
 
