@@ -65,7 +65,11 @@ export function playlistRouter(context: Context): Router {
       res.status(200).send("<p>let's go chat</p>");
     } catch (e) {
       console.error(e);
-      res.status(422).send(`<span style="color: red">unable to add '${url}' to playlist: ${e}</span>`);
+      res
+        .status(422)
+        .send(
+          `<span style="color: red">unable to add '${url}' to playlist: ${e}</span>`
+        );
     }
   });
 
@@ -87,8 +91,18 @@ export function playlistRouter(context: Context): Router {
   router.patch("/goto/:id", (req, res) => {
     const id = req.params.id;
     const updated = context.gotoMedia(id);
-    res.status(updated? 200 : 304).send();
-  })
+    res.status(updated ? 200 : 304).send();
+  });
+
+  router.get("/servermedia", (req, res) => {
+    const currentMedia = context.playlist.getCurrentMedia();
+    if (currentMedia?.type !== "server") {
+      res.status(404).send();
+      return;
+    }
+
+    res.status(200).sendFile(currentMedia.path);
+  });
 
   return router;
 }

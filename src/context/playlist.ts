@@ -92,7 +92,7 @@ export class Playlist {
     const newMediaId = this.#getPlaylistMediaId(newIndex);
     let media;
     if (newMediaId === undefined) {
-      newIndex = -1;
+      newIndex = this.playlist.length > 0? 0 : -1;
     } else {
       media = this.#getMediaFromId(newMediaId);
     }

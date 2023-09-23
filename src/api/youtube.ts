@@ -8,7 +8,7 @@ import { startsWithSubstring } from "../utils.js";
 export type YoutubeData = {
   title?: string;
   channel?: string;
-  duration?: Duration;
+  duration?: number;
   width?: number;
   height?: number;
 };
@@ -77,15 +77,20 @@ export class Youtube {
 
     await this.limiter.removeTokens(1);
     const video = await this.#fetchVideoNoCache(id);
-    const invalidDuration = Duration.fromObject({
-      minutes: 99,
-      seconds: 99,
-    });
+    function parseDuration(duration: string): Duration {
+      console.debug(duration);
+      const tokens = duration.split(":").reverse();
+      return Duration.fromObject({
+        second: parseFloat(tokens[0] ?? "0"),
+        minute: parseFloat(tokens[1] ?? "0"),
+        hour: parseFloat(tokens[2] ?? "0"),
+      });
+    }
     return {
       type: "yt",
       ytId: id,
       link: `https://youtu.be/${id}`,
-      length: video.duration ?? invalidDuration,
+      length: video.duration ?? (99*60+99),
       aspectRatio:
         video.width !== undefined && video.height !== undefined
           ? `${video.width}/${video.height}`

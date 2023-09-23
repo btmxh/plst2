@@ -13,6 +13,8 @@ block content
         div#player-wrapper
             div#yt-player-wrapper
                 div#yt-player
+            div#server-player-wrapper
+                video#server-player(src='/playlist/servermedia' controls)
         div(id='player-details' class='tabbed-button-group')
             nav
                 ul
@@ -43,6 +45,7 @@ block content
                             button(type="submit", hx-patch="/playlist/move/down", hx-target="#diagnostics", hx-swap="afterbegin") down
                             button(type="submit", hx-patch="/playlist/prev", hx-target="#diagnostics", hx-swap="afterbegin") prev
                             button(type="submit", hx-delete="/playlist/delete", hx-target="#diagnostics", hx-swap="afterbegin") remove
+                            button.scroll-to-current-playing(type="button") current
                         div#playlist-container
                 section(class='tab') chat
                 section(class='tab')

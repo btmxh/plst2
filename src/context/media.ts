@@ -5,7 +5,8 @@ export type MediaData = (YoutubeVideoData | ServerMediaData) & MediaCommonData;
 export type MediaCommonData = {
   link: string;
   displayHtml: string;
-  length: Duration;
+  // in secs
+  length: number;
 };
 
 export type YoutubeVideoData = {
@@ -16,7 +17,7 @@ export type YoutubeVideoData = {
 
 export type ServerMediaData = {
   type: "server";
-  relativeUrl: string;
+  path: string;
 };
 
 export type Media = MediaData & { id: string };
