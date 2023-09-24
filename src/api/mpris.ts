@@ -3,6 +3,7 @@ import { Context } from "../context/context";
 // @ts-ignore
 import Player from "mpris-service";
 import { JSDOM } from "jsdom";
+import { pathToFileURL } from "url";
 
 export interface MprisClient {
   update(context: Context): void;
@@ -71,6 +72,7 @@ export class DefaultMprisClient {
         ),
         "mpris:length":
           Math.round(currentPlaying.length) ?? (99 * 60 + 99) * 1000,
+        "xesam:url": currentPlaying.link,
         ...xesam,
       };
     this.mprisPlayer.playbackStatus = "Playing";
