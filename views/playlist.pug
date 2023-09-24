@@ -4,19 +4,26 @@ if playlist.playlist.length == 0
         span add more?
 else
     - const currentMediaIndex = playlist.playlist.length - 1 - playlist.currentMediaIndex;
-    each media, index in playlist.getMedias().reverse()
-        - const humanIndex = playlist.playlist.length - index
-        - const current = index === currentMediaIndex;
-        div.playlist-entry(id=current? "playlist-current-playing" : false)
-            input(type="checkbox", name=`playlist-media-${media.id}`, checked=mediaChecked(media.id))
-            label(for=`playlist-media-${media.id}`)
-                if index === currentMediaIndex
-                    span(style="color: rgb(12, 187, 0)")
-                        | > 
-                span.playlist-index !{humanIndex}. 
-                | !{media.displayHtml}
-            div.playlist-utilities
-                a(href=media.link, target="_blank") link
-                button.link-button(type="button", onclick=`navigator.clipboard.writeText('${media.link}')`) copy
-                a(hx-patch="/playlist/goto/" + media.id, hx-target="#diagnostics", hx-swap="afterbegin") goto
-
+    - let totalDuration = 0
+    - for(const media of playlist.getMedias()) if(!isNaN(media.length)) totalDuration += media.length
+    div.playlist-stats
+        | Total duration: !{formatDuration(totalDuration)}
+    div.main-playlist
+        each media, index in playlist.getMedias().reverse()
+            - const humanIndex = playlist.playlist.length - index
+            - const current = index === currentMediaIndex;
+            - totalDuration += media.length
+            div.playlist-entry(id=current? "playlist-current-playing" : false)
+                div.playlist-entry-content
+                    input(type="checkbox", name=`playlist-media-${media.id}`, checked=mediaChecked(media.id))
+                    label(for=`playlist-media-${media.id}`)
+                        if index === currentMediaIndex
+                            span(style="color: rgb(12, 187, 0)")
+                                | > 
+                        span.playlist-index !{humanIndex}. 
+                        | !{media.displayHtml}
+                    div.playlist-utilities
+                        a(href=media.link, target="_blank") link
+                        button.link-button(type="button", style="display: inline" onclick=`navigator.clipboard.writeText('${media.link}')`) copy
+                        a(hx-patch="/playlist/goto/" + media.id, hx-target="#diagnostics", hx-swap="afterbegin") goto
+                div.playlist-media-duration !{formatDuration(media.length)}

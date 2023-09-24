@@ -28,9 +28,8 @@ export class Context {
 
   toJSON() {
     return {
-      ...this,
-      websocketServer: undefined,
-      mprisPlayer: undefined,
+      playlist: this.playlist,
+      youtube: this.youtube,
     };
   }
 

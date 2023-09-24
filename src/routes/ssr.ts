@@ -9,7 +9,23 @@ export function ssrRouter(context: Context): Router {
       "playlist",
       {
         ...context,
-        mediaChecked: (id: string) => req.query[`playlist-media-${id}`] === "on",
+        mediaChecked: (id: string) =>
+          req.query[`playlist-media-${id}`] === "on",
+        formatDuration: (secs: number) => {
+          const hr = Math.floor(secs / 3600);
+          const mn = Math.floor(secs / 60) % 60;
+          const sc = Math.round(secs % 60);
+
+          if (hr > 0) {
+            return `${hr}:${mn.toString().padStart(2, "0")}:${sc
+              .toString()
+              .padStart(2, "0")}`;
+          } else {
+            return `${mn.toString().padStart(2, "0")}:${sc
+              .toString()
+              .padStart(2, "0")}`;
+          }
+        },
       },
       (err, html) => {
         if (err) {
