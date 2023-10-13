@@ -7,7 +7,7 @@ import {
 let socket: ReconnectableSocket | undefined = undefined;
 
 const serverVideoPlayer = document.getElementById(
-  "server-player"
+  "server-player",
 ) as HTMLVideoElement;
 serverVideoPlayer.addEventListener("ended", (e) => socket?.send("next"));
 
@@ -15,7 +15,6 @@ const stopAllPlayers = async () => {
   await stopAllYTPlayers();
   serverVideoPlayer.pause();
 };
-
 
 const fetchPlayer = async () => {
   const current = await fetch("/api/playlist/current").then((r) => r.json());
@@ -66,11 +65,11 @@ socket = new ReconnectableSocket((msg) => {
   }
 });
 
-[...document.querySelectorAll('.scroll-to-current-playing')].forEach((e) => {
-  e.addEventListener('click', () => {
-    const currentPlaying = document.querySelector('#playlist-current-playing');
+[...document.querySelectorAll(".scroll-to-current-playing")].forEach((e) => {
+  e.addEventListener("click", () => {
+    const currentPlaying = document.querySelector("#playlist-current-playing");
     currentPlaying?.scrollIntoView({
-      behavior: "smooth"
+      behavior: "smooth",
     });
   });
 });
