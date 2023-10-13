@@ -1,4 +1,4 @@
-import { Duration } from "luxon";
+import { DateTime } from "luxon";
 import { MediaCommonData, YoutubeVideoData } from "../context/media.js";
 import { spawn } from "node:child_process";
 import { AsyncCache } from "../context/async_cache.js";
@@ -36,7 +36,7 @@ export class Youtube {
   }
 
   async fetchMedia(id: string): Promise<YoutubeMedia> {
-    return this.cache.fetch(id);
+    return await this.cache.fetch(id);
   }
 
   // return stdout
@@ -77,15 +77,6 @@ export class Youtube {
 
     await this.limiter.removeTokens(1);
     const video = await this.#fetchVideoNoCache(id);
-    function parseDuration(duration: string): Duration {
-      console.debug(duration);
-      const tokens = duration.split(":").reverse();
-      return Duration.fromObject({
-        second: parseFloat(tokens[0] ?? "0"),
-        minute: parseFloat(tokens[1] ?? "0"),
-        hour: parseFloat(tokens[2] ?? "0"),
-      });
-    }
     return {
       type: "yt",
       ytId: id,
@@ -95,7 +86,7 @@ export class Youtube {
         video.width !== undefined && video.height !== undefined
           ? `${video.width}/${video.height}`
           : "16/9",
-      displayHtml: this.#createYoutubeDisplayHTML(video),
+      displayHtml: this.#createYoutubeDisplayHTML(video, DateTime.now()),
     };
   }
 
@@ -107,7 +98,7 @@ export class Youtube {
     return stdout.trim();
   }
 
-  #createYoutubeDisplayHTML(data: YoutubeData): string {
+  #createYoutubeDisplayHTML(data: YoutubeData, addDate: DateTime): string {
     let html = "";
     if (data.title === undefined) {
       html += `<span class="yt-title yt-title-invalid">undefined</span>`;
@@ -119,6 +110,8 @@ export class Youtube {
       html += `<span class="yt-separator"> - </span>
                <span class="yt-author">${data.channel}</span>`;
     }
+
+    html += `<span class="media-add-date"> (added on ${addDate.toISODate()})</span>`;
 
     return html;
   }

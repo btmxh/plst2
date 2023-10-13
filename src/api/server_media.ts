@@ -2,6 +2,7 @@ import { fileURLToPath } from "url";
 import { MediaCommonData, ServerMediaData } from "../context/media";
 import path from "path";
 import { spawn } from "node:child_process";
+import { DateTime } from "luxon";
 
 async function getMediaLength(path: string): Promise<number | undefined> {
   const process = spawn("ffprobe", [
@@ -42,7 +43,7 @@ export async function urlToServerMedia(
     return {
       type: "server",
       path: filePath,
-      displayHtml: `<span class="server-prefix">(server) </span><span class="server-path">${basename}</span>`,
+      displayHtml: `<span class="server-prefix">(server) </span><span class="server-path">${basename}</span><span class="media-add-date"> (added on ${DateTime.now().toISODate()})</span>`,
       length: (await getMediaLength(filePath)) ?? 99 * 60 + 99,
       link: url,
     };
