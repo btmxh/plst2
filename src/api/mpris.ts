@@ -17,6 +17,7 @@ export class NoopMprisClient {
 
 export class DefaultMprisClient {
   mprisPlayer: Player;
+  playing = true;
 
   constructor(context: Context) {
     this.mprisPlayer = Player({
@@ -31,6 +32,22 @@ export class DefaultMprisClient {
     this.mprisPlayer.on("previous", () =>
       context.updatePlaylistIndex((i) => i - 1)
     );
+    this.mprisPlayer.on("play", () => {
+      context.announce("play");
+    });
+    this.mprisPlayer.on("pause", () => {
+      context.announce("pause");
+    });
+    this.mprisPlayer.on("playpause", () => {
+      if(this.playing) {
+        context.announce("pause");
+      } else {
+        context.announce("play");
+      }
+
+      this.playing = !this.playing;
+      this.update(context);
+    });
 
     this.update(context);
   }
@@ -75,7 +92,7 @@ export class DefaultMprisClient {
         "xesam:url": currentPlaying.link,
         ...xesam,
       };
-    this.mprisPlayer.playbackStatus = "Playing";
+    this.mprisPlayer.playbackStatus = this.playing? "Playing" : "Paused";
   }
 }
 

@@ -16,8 +16,10 @@ const stopAllPlayers = async () => {
   serverVideoPlayer.pause();
 };
 
+let current: any;
+
 const fetchPlayer = async () => {
-  const current = await fetch("/api/playlist/current").then((r) => r.json());
+  current = await fetch("/api/playlist/current").then((r) => r.json());
   const playerWrapper = document.getElementById("player-wrapper")!;
   for (const child of playerWrapper.children) {
     child.classList.remove("active");
@@ -56,12 +58,51 @@ const fetchPlaylist = async () => {
   document.body.dispatchEvent(new Event("refresh-playlist"));
 };
 
-socket = new ReconnectableSocket((msg) => {
+const playerPlay = async () => {
+  if(current?.type === "yt") {
+    const player = await getCachedYoutubePlayer("yt-player");
+    player.playVideo();
+  } else if(current?.type === "server") {
+    serverVideoPlayer.play();
+  }
+};
+
+const playerPause = async () => {
+  if(current?.type === "yt") {
+    const player = await getCachedYoutubePlayer("yt-player");
+    player.pauseVideo();
+  } else if(current?.type === "server") {
+    serverVideoPlayer.play();
+  }
+};
+
+const playerPlaying = async () => {
+  if(current?.type === "yt") {
+    const player = await getCachedYoutubePlayer("yt-player");
+    return player.getPlayerState() !== YT.PlayerState.PAUSED;
+  } else if(current?.type === "server") {
+    return !serverVideoPlayer.paused;
+  }
+
+  return false;
+};
+
+socket = new ReconnectableSocket(async (msg) => {
   if (msg === "refresh-playlist") {
     fetchPlaylist();
   } else if (msg === "media-changed") {
     fetchPlaylist();
     fetchPlayer();
+  } else if(msg === "play") {
+    playerPlay();
+  } else if(msg === "pause") {
+    playerPause();
+  } else if(msg === "playpause") {
+    if(await playerPlaying()) {
+      playerPause();
+    } else {
+      playerPlay();
+    }
   }
 });
 

@@ -44,7 +44,7 @@ const cache = new Map<string, Promise<YT.Player>>();
 
 export function getCachedYoutubePlayer(
   playerId: string,
-  onStateChange: (e: YT.OnStateChangeEvent) => void,
+  onStateChange: (e: YT.OnStateChangeEvent) => void = () => {},
   cacheId = ""
 ): Promise<YT.Player> {
   const cachedPlayer = cache.get(cacheId);

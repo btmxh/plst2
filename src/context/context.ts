@@ -113,6 +113,10 @@ export class Context {
     return true;
   }
 
+  announce(msg: string): void {
+    this.websocketServer.clients.forEach((client) => client.send(msg));
+  }
+
   movePlaylistMedias(ids: Set<string>, offset: number): boolean {
     if (!this.playlist.moveMedias(ids, offset)) {
       return false;
