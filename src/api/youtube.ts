@@ -16,6 +16,7 @@ export type YoutubeData = {
 export type YoutubeMedia = YoutubeVideoData & MediaCommonData;
 export class Youtube {
   cache: AsyncCache<string, YoutubeMedia>;
+  playlistCache: AsyncCache<string, string[]>;
   limiter = new RateLimiter({
     tokensPerInterval: 1,
     interval: "second",
@@ -25,6 +26,11 @@ export class Youtube {
     this.cache = new AsyncCache(
       (id) => this.#fetchVideoToMediaNoCache(id),
       json?.cache
+    );
+
+    this.playlistCache = new AsyncCache(
+      (id) => this.#fetchPlaylistVideos(id),
+      json?.playlistCache
     );
   }
 
@@ -57,6 +63,11 @@ export class Youtube {
       });
       setTimeout(() => reject("youtube-dl timeout"), 10000);
     });
+  }
+
+  async #fetchPlaylistVideos(id: string): Promise<string[]> {
+    const ids = await this.#spawnYoutubeDL(["--flat-playlist", "--print", "id", `https://www.youtube.com/playlist?list=${id}`]);
+    return ids.split("\n").map(id => id.trim()).filter(id => id.length > 0)
   }
 
   async #fetchVideoNoCache(id: string): Promise<YoutubeData> {
@@ -116,7 +127,7 @@ export class Youtube {
     return html;
   }
 
-  urlToVideoId(url: string): string | undefined {
+  async urlToVideoIdList(url: string): Promise<YoutubeMedia[] | undefined> {
     try {
       if (!url.startsWith("http")) {
         url = `https://${url}`;
@@ -131,15 +142,27 @@ export class Youtube {
         return undefined;
       }
       const queryId = urlObj.searchParams.get("v");
+      const listId = urlObj.searchParams.get("list");
       const pathname = urlObj.pathname;
       const lastSlash = pathname.lastIndexOf("/");
       let lastPathComponent =
         lastSlash < 0
           ? undefined
           : decodeURIComponent(pathname.substring(lastSlash + 1));
-      return queryId ?? lastPathComponent ?? undefined;
-    } catch {
-      return undefined;
-    }
+      if(queryId !== null) {
+        return [await this.cache.fetch(queryId)];
+      }
+
+      if(listId !== null) {
+        const ids =  await this.playlistCache.fetch(listId);
+        return Promise.all(ids.map(id => this.cache.fetch(id)));
+      }
+
+      if(lastPathComponent !== undefined) {
+        return [await this.cache.fetch(lastPathComponent)];
+      }
+    } catch {}
+    
+    return undefined;
   }
 }

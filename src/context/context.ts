@@ -41,10 +41,14 @@ export class Context {
       return;
     }
 
-    const ytId = this.youtube.urlToVideoId(url);
-    if (ytId !== undefined) {
-      const video = await this.youtube.fetchMedia(ytId);
-      this.playlist.add(video, position);
+    const videos = await this.youtube.urlToVideoIdList(url);
+    if(videos !== undefined) {
+      if(position === PlaylistAddPosition.QueueNext) {
+        videos.reverse();
+      }
+      for(const video of videos) {
+        this.playlist.add(video, position);
+      }
       this.#triggerPlaylistRefresh();
       return;
     }
