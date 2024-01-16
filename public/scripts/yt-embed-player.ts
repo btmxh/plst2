@@ -1,6 +1,7 @@
 function createYoutubePlayer(
   playerId: string,
-  onStateChange: (e: YT.OnStateChangeEvent) => void
+  onStateChange: (e: YT.OnStateChangeEvent) => void,
+  onError: (e: YT.OnErrorEvent) => void,
 ): Promise<YT.Player> {
   let ytPlayer: YT.Player | undefined = undefined;
   let resolveFn: (p: YT.Player) => void = () => {};
@@ -22,6 +23,7 @@ function createYoutubePlayer(
           console.log("yt player loaded");
         },
         onStateChange,
+        onError,
       },
     });
   };
@@ -45,6 +47,7 @@ const cache = new Map<string, Promise<YT.Player>>();
 export function getCachedYoutubePlayer(
   playerId: string,
   onStateChange: (e: YT.OnStateChangeEvent) => void = () => {},
+  onError: (e: YT.OnErrorEvent) => void = () => {},
   cacheId = ""
 ): Promise<YT.Player> {
   const cachedPlayer = cache.get(cacheId);
@@ -52,7 +55,7 @@ export function getCachedYoutubePlayer(
     return cachedPlayer;
   }
 
-  const player = createYoutubePlayer(playerId, onStateChange);
+  const player = createYoutubePlayer(playerId, onStateChange, onError);
   cache.set(cacheId, player);
   return player;
 }

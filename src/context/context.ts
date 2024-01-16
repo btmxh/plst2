@@ -42,11 +42,11 @@ export class Context {
     }
 
     const videos = await this.youtube.urlToVideoIdList(url);
-    if(videos !== undefined) {
-      if(position === PlaylistAddPosition.QueueNext) {
+    if (videos !== undefined) {
+      if (position === PlaylistAddPosition.QueueNext) {
         videos.reverse();
       }
-      for(const video of videos) {
+      for (const video of videos) {
         this.playlist.add(video, position);
       }
       this.#triggerPlaylistRefresh();
@@ -117,8 +117,12 @@ export class Context {
     return true;
   }
 
-  announce(msg: string): void {
-    this.websocketServer.clients.forEach((client) => client.send(msg));
+  announce(msg: string, exceptClient: ws.WebSocket | undefined = undefined): void {
+    this.websocketServer.clients.forEach((client) => {
+      if (client !== exceptClient) {
+        client.send(msg);
+      }
+    });
   }
 
   movePlaylistMedias(ids: Set<string>, offset: number): boolean {
@@ -167,6 +171,10 @@ export class Context {
           if (this.playlist.canNext(this.websocketServer.clients)) {
             this.updatePlaylistIndex((i) => i + 1);
           }
+        } else if (e.data === "play") {
+          this.mprisClient.play(this, ws);
+        } else if(e.data === "pause") {
+          this.mprisClient.pause(this, ws);
         }
       };
     });

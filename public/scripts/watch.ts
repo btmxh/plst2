@@ -31,7 +31,14 @@ const fetchPlayer = async () => {
     const ytPlayer = await getCachedYoutubePlayer("yt-player", (e) => {
       if (e.data === YT.PlayerState.ENDED) {
         socket?.send("next");
+      } else if(e.data === YT.PlayerState.PAUSED) {
+        socket?.send("pause");
+      } else if(e.data === YT.PlayerState.PLAYING) {
+        socket?.send("play");
       }
+    }, () => {
+      console.debug(socket);
+      socket?.send("next");
     });
     const ytPlayerWrapper = document.getElementById("yt-player-wrapper")!;
     ytPlayerWrapper.style.aspectRatio = current.aspectRatio;

@@ -20,6 +20,7 @@ export class ReconnectableSocket {
       console.log("WebSocket connection established");
       if (this.socket !== undefined) {
         for (const msg of this.messageQueue) {
+          console.log("message sented:", msg);
           this.socket.send(msg);
         }
 
@@ -51,6 +52,7 @@ export class ReconnectableSocket {
 
   send(msg: string) {
     if (this.socket !== undefined) {
+      console.log("message sented:", msg);
       this.socket.send(msg);
     } else {
       this.messageQueue.push(msg);

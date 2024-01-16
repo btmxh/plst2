@@ -3,16 +3,21 @@ import { Context } from "../context/context";
 // @ts-ignore
 import Player from "mpris-service";
 import { JSDOM } from "jsdom";
-import { pathToFileURL } from "url";
+import * as ws from "ws";
+import { exec } from "child_process";
 
 export interface MprisClient {
   update(context: Context): void;
+  play(context: Context, client: ws.WebSocket | undefined): void;
+  pause(context: Context, client: ws.WebSocket | undefined): void;
 }
 
 export class NoopMprisClient {
-  constructor() {}
+  constructor() { }
 
-  update() {}
+  update() { }
+  play() { }
+  pause() { }
 }
 
 export class DefaultMprisClient {
@@ -39,7 +44,7 @@ export class DefaultMprisClient {
       context.announce("pause");
     });
     this.mprisPlayer.on("playpause", () => {
-      if(this.playing) {
+      if (this.playing) {
         context.announce("pause");
       } else {
         context.announce("play");
@@ -92,7 +97,41 @@ export class DefaultMprisClient {
         "xesam:url": currentPlaying.link,
         ...xesam,
       };
-    this.mprisPlayer.playbackStatus = this.playing? "Playing" : "Paused";
+    this.mprisPlayer.playbackStatus = this.playing ? "Playing" : "Paused";
+    this.updateI3StatusBar();
+  }
+
+  updateI3StatusBar() {
+    if (process.env.NO_I3STATUS !== undefined) {
+      return;
+    }
+
+    console.log("refreshing i3status");
+    exec("killall -USR1 i3status", (error, stdout, stderr) => {
+      if (error) {
+        console.log(`error: ${error.message}`);
+        return;
+      }
+      if (stderr) {
+        console.log(`stderr: ${stderr}`);
+        return;
+      }
+      if(stdout) {
+        console.log(`stdout: ${stdout}`);
+      }
+    });
+  }
+
+  play(context: Context, client: ws.WebSocket | undefined) {
+    this.playing = true;
+    this.update(context);
+    context.announce("play", client);
+  }
+
+  pause(context: Context, client: ws.WebSocket | undefined) {
+    this.playing = false;
+    this.update(context);
+    context.announce("pause", client);
   }
 }
 
